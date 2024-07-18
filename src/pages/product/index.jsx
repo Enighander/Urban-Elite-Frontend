@@ -5,7 +5,7 @@ import FooterComponent from "../../components/footer/footer";
 import { Breadcrumb, Spinner } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import { FaTruckFast, FaRecycle } from "react-icons/fa6";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Error404 from "../../components/error/404";
 import { ToastContainer, toast } from "react-toastify";
@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const ProductDetail = () => {
   const { name, _id } = useParams();
+  const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const username = localStorage.getItem("username");
   const [product, setProduct] = useState(null);
@@ -51,7 +52,6 @@ const ProductDetail = () => {
           response.data.product.length > 0
         ) {
           const productData = response.data.product[0];
-          console.log(response.data.product[0])
           setProduct(productData);
           setData((prevData) => ({
             ...prevData,
@@ -88,6 +88,9 @@ const ProductDetail = () => {
   };
 
   const handleAddCart = async () => {
+    if (!localStorage.getItem("token")) {
+      navigate("/login");
+    }
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP_API_URL}/cart`,
@@ -97,14 +100,6 @@ const ProductDetail = () => {
       console.log("order created successfully", response);
     } catch (error) {
       console.error("Error Creating Order:", error);
-    }
-  };
-
-  const handleProductClick = (name) => {
-    if (!localStorage.getItem("token")) {
-      navigate("/login");
-    } else {
-      navigate(`/products/${name}`);
     }
   };
 

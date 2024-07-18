@@ -2,13 +2,18 @@ import React, { useEffect, useState } from "react";
 import NavbarLogin from "../../../components/navbar/login";
 import Navbar from "../../../components/navbar";
 import FooterComponent from "../../../components/footer/footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Card, Spinner, Breadcrumb } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import Error404 from "../../../components/error/404";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AllProducts = () => {
+  const userId = localStorage.getItem("userId");
+  const username = localStorage.getItem("username");
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,7 +32,9 @@ const AllProducts = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_REACT_APP_API_URL}/products`
+          `${
+            import.meta.env.VITE_REACT_APP_API_URL
+          }/products`
         );
         if (response.data) {
           const data = response.data.products;
@@ -46,8 +53,38 @@ const AllProducts = () => {
     fetchProducts();
   }, []);
 
+  const handleAddToCart = async (product) => {
+    if (!localStorage.getItem("token")) {
+      navigate("/login");
+      return;
+    }
+
+    const data = {
+      quantity: 1,
+      product_name: product.name,
+      product_id: product._id,
+      image_product: product.image,
+      price: product.price,
+      user_id: userId,
+      username: username,
+    };
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_API_URL}/cart`,
+        data
+      );
+      toast.success("Item added to the cart successfully");
+      console.log("order created successfully", response);
+    } catch (error) {
+      console.error("Error Creating Order:", error);
+      toast.error("Failed to add item to the cart");
+    }
+  };
+
   return (
     <>
+      <ToastContainer position="bottom-right" autoClose={5000} />
       {showNavbarLogin ? <NavbarLogin /> : <Navbar />}
       <div className="flex my-5 mx-14 gap-5">
         {isLoading ? (
@@ -67,16 +104,18 @@ const AllProducts = () => {
               </Breadcrumb.Item>
               <Breadcrumb.Item>Our Products</Breadcrumb.Item>
             </Breadcrumb>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
               {products.map((product) => (
                 <Card
                   className="max-w-xs max-h-full"
                   imgAlt={`Product ${product.name}`}
                   imgSrc={product.image}
                   key={product.id}
-                > 
-                  <Link to={`/products/name/${product.name.replace(/ /g, '-')}`}>
-                    <h5 className="text-sm font-semibold tracking-tight text-gray-900 dark:text-white">
+                >
+                  <Link
+                    to={`/products/name/${product.name.replace(/ /g, "-")}`}
+                  >
+                    <h5 className="text-sm font-semibold tracking-tight text-gray-900 dark:text-white h-16 p-5">
                       {product.name}
                     </h5>
                   </Link>
@@ -100,12 +139,12 @@ const AllProducts = () => {
                     <span className="text-3xl font-bold text-gray-900 dark:text-white">
                       ${product.price}
                     </span>
-                    <a
-                      href="#"
+                    <button
+                      onClick={() => handleAddToCart(product)}
                       className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
                     >
                       Add to cart
-                    </a>
+                    </button>
                   </div>
                 </Card>
               ))}
