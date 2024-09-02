@@ -15,7 +15,7 @@ const NavbarComponent = () => {
     <header>
       <Navbar className="w-full p-5 bg-white shadow">
         <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center xl:-ml-32">
+          <div className="flex items-center xl:-ml-24">
             <Link to="/home" className="">
               <h1 className="text-black text-2xl font-bold tracking-wide dark:text-white">
                 Urban Elite

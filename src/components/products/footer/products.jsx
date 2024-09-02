@@ -46,10 +46,12 @@ const Products = () => {
     const data = {
       quantity: 1,
       product_name: product.name,
-      product_id: product._id,
+      productId: product._id,
       image_product: product.image,
       price: product.price,
-      user_id: userId,
+      color: product.color,
+      size: product.size,
+      userId: userId,
       username: username,
     };
     try {

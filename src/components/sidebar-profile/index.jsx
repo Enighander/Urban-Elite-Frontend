@@ -44,7 +44,7 @@ const SidebarProfile = () => {
             <h1>Manage Orders</h1>
           </li>
           <li className="flex flex-col ml-5 my-5 space-y-5">
-            <a href="#" className="flex text-dark group">
+            <a href={`/profile/user/${userId}/order-history`} className="flex text-dark group">
               <SlReload className="mx-2 size-7" />
               <span className="group-hover:text-slate-500 mx-2">My Order</span>
             </a>

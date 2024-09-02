@@ -12,7 +12,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ProductDetail = () => {
-  const { name, _id } = useParams();
+  const { name, _id, color, size } = useParams();
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const username = localStorage.getItem("username");
@@ -24,9 +24,11 @@ const ProductDetail = () => {
   const [data, setData] = useState({
     quantity,
     product_name: name,
-    product_id: _id,
+    productId: _id,
     image_product: "",
     price: 0,
+    color: color,
+    size: size,
     user_id: userId,
     username: username,
   });
@@ -58,6 +60,8 @@ const ProductDetail = () => {
             product_id: productData._id,
             product_name: productData.name,
             image_product: productData.image,
+            color: productData.color,
+            size: productData.size,
             price: productData.price,
           }));
         } else {

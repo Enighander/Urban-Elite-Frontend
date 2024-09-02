@@ -46,10 +46,12 @@ const BestSeller = () => {
     const data = {
       quantity: 1,
       product_name: product.name,
-      product_id: product._id,
+      productId: product._id,
       image_product: product.image,
       price: product.price,
-      user_id: userId,
+      color: product.color,
+      size: product.size,
+      userId: userId,
       username: username,
     };
     try {
@@ -57,6 +59,7 @@ const BestSeller = () => {
         `${import.meta.env.VITE_REACT_APP_API_URL}/cart`,
         data
       );
+      console.log("data cart :" , data)
       toast.success("Item added to the cart successfully");
       console.log("order created successfully", response);
     } catch (error) {

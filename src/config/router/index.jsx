@@ -14,6 +14,8 @@ import Profile from "../../pages/profile/index.jsx";
 import AddressBook from "../../pages/profile/user/address-book/index.jsx";
 import PaymentOption from "../../pages/profile/user/payment-option/index.jsx";
 import Cart from "../../pages/cart/index.jsx";
+import Order from "../../pages/order/index.jsx";
+import OrderHistory from "../../pages/profile/user/order-history/index.jsx"
 
 const Router = () => {
   return (
@@ -29,6 +31,7 @@ const Router = () => {
             <Route path="/forget-password" element={<ForgetPassword/>} />
             <Route path="/cart" element={<Cart/>}/>
             <Route path='/products' element={<AllProducts/>} />
+            <Route path='/order' element={<Order/>} />
             <Route path="/products/name/:name" element={<Products />} />
             <Route path="/products/categories/:name" element={<CategoryProduct/>} />
             <Route path="/products/best-seller" element={<ProductBestSeller/>} />
@@ -37,7 +40,7 @@ const Router = () => {
             <Route path="/profile/user/:id/change-password" element={<ChangePassword/>} />
             <Route path="/profile/user/:id/address-book" element={<AddressBook/>} />
             <Route path="/profile/user/:id/payment-option" element={<PaymentOption />} />
-      
+            <Route path="/profile/user/:id/order-history" element={<OrderHistory/>} />
             {/* User End */}
             {/* Admin */}
             

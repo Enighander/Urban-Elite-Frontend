@@ -60,10 +60,10 @@ const ProductBestSellers = () => {
     const data = {
       quantity: 1,
       product_name: product.name,
-      product_id: product._id,
+      productId: product._id,
       image_product: product.image,
       price: product.price,
-      user_id: userId,
+      userId: userId,
       username: username,
     };
     try {
