@@ -15,8 +15,8 @@ const NavbarComponent = () => {
     <header>
       <Navbar className="w-full p-5 bg-white shadow">
         <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center xl:-ml-24">
-            <Link to="/home" className="">
+          <div className="flex items-center xl:ml-16 lg:-ml-34">
+            <Link to="/home">
               <h1 className="text-black text-2xl font-bold tracking-wide dark:text-white">
                 Urban Elite
               </h1>
@@ -40,7 +40,7 @@ const NavbarComponent = () => {
               </Button>
             </div>
           </div>
-          <div className="flex items-center space-x-4 xl:-mr-32">
+          <div className="flex items-center xl:ml-16 lg:-ml-34">
             <div className="flex relative space-x-2">
               <input
                 type="text"
