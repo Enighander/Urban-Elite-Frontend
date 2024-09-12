@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../components/navbar/index.jsx";
 import NavbarLogin from "../../components/navbar/login/index.jsx";
-import Sidebar from "../../components/sidebar/sidebar";
 import CarouselHeader from "../../components/carousel/carousel-header/carousel";
 import Categories from "../../components/categories/categories";
 import FlashSale from "../../components/products/body/flashsale";

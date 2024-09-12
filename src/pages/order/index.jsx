@@ -149,11 +149,16 @@ const Order = () => {
     onSubmit: async () => {
       setIsLoading(true);
       try {
+        const totalPrice = cart.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        );
         const orderData = {
-          userId,  
-          username,  
-          addressId: address._id, 
-          paymentMethod: selectedPayment, 
+          userId,
+          username,
+          addressId: address._id,
+          paymentMethod: selectedPayment,
+          totalPrice,
         };
         console.log("response orderData = ", orderData);
         const response = await axios.post(
@@ -313,6 +318,7 @@ const Order = () => {
                             <TextInput
                               className="2xl:w-[250px]"
                               {...formik.getFieldProps("recipient_name")}
+                              disabled
                             />
                             {formik.touched.recipient_name &&
                             formik.errors.recipient_name ? (
@@ -328,6 +334,7 @@ const Order = () => {
                             <TextInput
                               className="2xl:w-[250px]"
                               {...formik.getFieldProps("phone_number")}
+                              disabled
                             />
                             {formik.touched.phone_number &&
                             formik.errors.phone_number ? (
@@ -344,6 +351,7 @@ const Order = () => {
                           <TextInput
                             className="2xl:w-[520px]"
                             {...formik.getFieldProps("address")}
+                            disabled
                           />
                           {formik.touched.address && formik.errors.address ? (
                             <div className="text-red-500 text-sm text-left">
@@ -359,6 +367,7 @@ const Order = () => {
                             <TextInput
                               className="2xl:w-[250px]"
                               {...formik.getFieldProps("postal_code")}
+                              disabled
                             />
                             {formik.touched.postal_code &&
                             formik.errors.postal_code ? (
@@ -374,6 +383,7 @@ const Order = () => {
                             <TextInput
                               className="2xl:w-[250px]"
                               {...formik.getFieldProps("city")}
+                              disabled
                             />
                             {formik.touched.city && formik.errors.city ? (
                               <div className="text-red-500 text-sm text-left">

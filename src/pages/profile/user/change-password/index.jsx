@@ -125,7 +125,7 @@ const ChangePassword = () => {
           <div className="p-4 my-10 grid grid-cols-6 grid-rows-4">
             <SidebarProfile />
             <div className="col-span-3 row-span-4 col-start-3">
-              <div className="w-full h-auto rounded p-8 relative border border-solid border-opacity-50 shadow-2xl">
+              <div className="bg-white dark:bg-[#1F2937] w-full h-auto border border-transparent rounded-2xl p-8 relative shadow-2xl">
                 <h2 className=" text-xl font-medium mb-8 text-left">
                   Change Your Password
                 </h2>

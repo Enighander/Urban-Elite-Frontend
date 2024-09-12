@@ -1,18 +1,140 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import NavbarLogin from "../../../../components/navbar/login";
-import SidebarLogin from "../../../../components/sidebar-profile";
 import FooterComponent from "../../../../components/footer/footer";
 import Error404 from "../../../../components/error/404";
-import { Breadcrumb } from "flowbite-react";
-import { HiHome, HiCheckCircle } from "react-icons/hi";
+import {
+  Breadcrumb,
+  Pagination,
+  Button,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  Spinner,
+} from "flowbite-react";
+import { HiHome } from "react-icons/hi";
 import SidebarProfile from "../../../../components/sidebar-profile";
+import axios from "axios";
 
 const OrderHistory = () => {
   const userId = localStorage.getItem("userId");
   const username = localStorage.getItem("username");
+  const [order, setOrder] = useState([]);
+  const [address, setAddress] = useState([]);
+  const [showNavbarLogin, setShowNavbarLogin] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [openModalDetails, setOpenModalDetails] = useState(false);
+  const [showConfirmPayment, setShowConfirmPayment] = useState(false);
+  const [openModalConfirmPayment, setOpenModalConfirmPayment] = useState(false);
+  const onPageChange = (page) => setCurrentPage(page);
+
+  useEffect(() => {
+    const userToken = localStorage.getItem("token");
+    if (userToken) {
+      setShowNavbarLogin(true);
+    } else {
+      setShowNavbarLogin(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_REACT_APP_API_URL}/order/UUID/${userId}`
+        );
+        if (Array.isArray(response.data.order)) {
+          setOrder(response.data.order);
+          console.log(response.data.order);
+        } else {
+          console.error("invalid order data:", response.data.order);
+          setOrder([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch order:", error);
+        setOrder([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchOrder();
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      try {
+        const response = await axios.get(
+          `${
+            import.meta.env.VITE_REACT_APP_API_URL
+          }/address/username/${username}`
+        );
+        if (response.data && response.data.address) {
+          setAddress(response.data.address);
+          console.log(response.data.address);
+        } else {
+          console.log("invalid address data:", response.data.address);
+          setAddress([]);
+        }
+      } catch (error) {
+        console.error("failed to fetch address:", error);
+        setAddress([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchAddress();
+  }, [username]);
+
+  if (isLoading) {
+    return (
+      <div className="text-center">
+        <Spinner aria-label="Center-aligned spinner" />
+      </div>
+    );
+  }
+
+  const handleViewDetail = (order) => {
+    setSelectedOrder(order);
+    setOpenModalDetails(true);
+  };
+
+  const handleConfirmPayment = (order) => {
+    setSelectedOrder(order);
+    if (order.paymentStatus === "pending") {
+      setShowConfirmPayment(true);
+    } else {
+      setShowConfirmPayment(false);
+    }
+    setOpenModalConfirmPayment(true)
+  };
+
+  const PaymentStatus = ({ status }) => {
+    let statusColor;
+    switch (status) {
+      case "pending":
+        statusColor = "text-yellow-500";
+        break;
+      case "paid":
+        statusColor = "text-green-500";
+        break;
+      case "failed":
+        statusColor = "text-red-500";
+        break;
+      default:
+        statusColor = "text-gray-500 dark:text-white";
+    }
+
+    return (
+      <span className={`font-bold ${statusColor}`}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    );
+  };
+
   return (
     <>
-      <NavbarLogin />
+      {showNavbarLogin ? <NavbarLogin /> : <Navbar />}
       <div className="flex justify-between my-10 xl:ml-16">
         <Breadcrumb aria-label="Default breadcrumb example">
           <Breadcrumb.Item href="/home" icon={HiHome}>
@@ -33,12 +155,193 @@ const OrderHistory = () => {
         <div className="p-4 my-10 grid grid-cols-6 grid-rows-4">
           <SidebarProfile />
           <div className="col-span-3 row-span-4 col-start-3">
-            <div className="bg-white dark:bg-gray-900 w-full h-auto rounded p-8 relative border border-solid border-opacity-50 shadow-2xl">
+            <div className="bg-white dark:bg-[#1F2937] w-full h-auto border border-transparent rounded-2xl p-8 relative shadow-2xl">
               <h2 className=" text-xl font-medium mb-8 text-left">
                 Order History
-              </h2>
-              <div >
-                <h2 className="text-left">Order#13002</h2>
+              </h2>{" "}
+              {order.length === 0 ? (
+                <p>your order is empty</p>
+              ) : (
+                <div>
+                  {Array.isArray(order) &&
+                    order.map((item) => (
+                      <>
+                        <div
+                          className="flex justify-between my-10"
+                          key={item._id}
+                        >
+                          <div className="flex flex-col space-y-4 ">
+                            <h1>Order Number</h1>
+                            <span className="text-left uppercase">
+                              #{item._id.slice(0, 8)}
+                            </span>
+                          </div>
+                          <div className="flex flex-col space-y-4">
+                            <h1 className="text-left">Payment</h1>
+                            <span className="text-left">
+                              {item.paymentMethod}
+                            </span>
+                          </div>
+                          <div className="flex flex-col space-y-4">
+                            <h1 className="text-left">Status</h1>
+                            <PaymentStatus status={item.paymentStatus} />
+                          </div>
+                          <div className="flex flex-col space-y-4">
+                            <h1>Total</h1>
+                            <span>${item.totalPrice}</span>
+                          </div>
+
+                          <div className="flex items-center">
+                            <div className="space-y-2">
+                              <Button
+                                size="xs"
+                                onClick={() => handleViewDetail(item)}
+                              >
+                                View Details
+                              </Button>
+                              {item.paymentStatus === "pending" && (
+                                <Button
+                                  size="xs"
+                                  color="yellow"
+                                  onClick={() => handleConfirmPayment(item)}
+                                >
+                                  Confirm Payment
+                                </Button>
+                              )}
+                            </div>
+
+                            <Modal
+                              show={openModalDetails}
+                              onClose={() => setOpenModalDetails(false)}
+                            >
+                              <ModalHeader>Order Details</ModalHeader>
+
+                              <ModalBody>
+                                {selectedOrder && (
+                                  <>
+                                    <div className="flex justify-center 2xl:text-xl">
+                                      <h1 className="dark: text-white">
+                                        Order ID :
+                                      </h1>
+                                      <span className="mx-2 dark: text-white uppercase">
+                                        # {selectedOrder._id.slice(0, 8)}
+                                      </span>
+                                    </div>
+                                    <div className="flex flex-col dark: text-white">
+                                      <div className="flex justify-end my-2">
+                                        <h1>
+                                          Status :{" "}
+                                          <PaymentStatus
+                                            status={selectedOrder.paymentStatus}
+                                          />
+                                        </h1>
+                                      </div>
+                                      <div className="my-2">
+                                        {selectedOrder.products.map(
+                                          (product) => (
+                                            <div
+                                              className="flex items-center"
+                                              key={product._id}
+                                            >
+                                              <img
+                                                src={product.image_product}
+                                                className="w-14 h-14 object-cover"
+                                              />
+                                              <div className="flex flex-col mx-5 my-5 w-">
+                                                <span>
+                                                  {product.product_name}
+                                                </span>
+                                                <div className="flex space-x-10">
+                                                  <span>
+                                                    x {product.quantity}
+                                                  </span>
+                                                  <span>$ {product.price}</span>
+                                                </div>
+                                              </div>
+                                              <div></div>
+                                            </div>
+                                          )
+                                        )}
+                                        <div className="mt-3">
+                                          <div className="flex justify-between">
+                                            <h2 className="text-md my-2">
+                                              Sub Total
+                                            </h2>
+                                            <h2 className="text-md">
+                                              $ {selectedOrder.totalPrice}
+                                            </h2>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <h2 className="text-md my-2">
+                                              Shipment Fee
+                                            </h2>
+                                            <h2 className="text-md">Free</h2>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <h2 className="text-md my-2">
+                                              Total Price
+                                            </h2>
+                                            <h2 className="text-md">
+                                              $ {selectedOrder.totalPrice}
+                                            </h2>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="my-3 border border-solid" />
+                                      <h1 className="text-lg my-2">
+                                        Shipment info
+                                      </h1>
+                                      <div className="flex justify-between">
+                                        <div className="flex flex-col">
+                                          <span>{address.recipient_name}</span>
+                                          <span>
+                                            {address.address} {address.city}{" "}
+                                            {address.postal_code}{" "}
+                                          </span>
+                                          <span>{address.phone_number}</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                          {showConfirmPayment && (
+                                            <div>
+                                              <Button
+                                                color="yellow"
+                                                onClick={() =>
+                                                  alert("Confirm Payment")
+                                                }
+                                              >
+                                                Confirm Payment
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+                              </ModalBody>
+                            </Modal>
+                            <Modal
+                              show={openModalConfirmPayment}
+                              onClose={() => setOpenModalConfirmPayment(false)}
+                            >
+                              <Modal.Header>
+                                Confirm Payment
+                              </Modal.Header>
+                            </Modal>
+                          </div>
+                        </div>
+                        <div className="mt-5 border border-solid border-slate-200 dark:border-gray-500" />
+                      </>
+                    ))}
+                </div>
+              )}
+              <div className="mt-10 flex overflow-x-auto justify-center">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={100}
+                  onPageChange={onPageChange}
+                  showIcons
+                />
               </div>
             </div>
           </div>
