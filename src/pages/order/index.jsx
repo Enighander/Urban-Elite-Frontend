@@ -6,12 +6,8 @@ import {
   Breadcrumb,
   Button,
   Label,
-  Radio,
   TextInput,
   Spinner,
-  Modal,
-  ModalBody,
-  ModalHeader,
 } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import { CiLock } from "react-icons/ci";
@@ -47,9 +43,6 @@ const Order = () => {
   const userId = localStorage.getItem("userId");
   const username = localStorage.getItem("username");
   const [address, setAddress] = useState([]);
-  const [openModalPayment, setOpenModalPayment] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState([]);
   const [cart, setCart] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -114,29 +107,6 @@ const Order = () => {
     fetchUserAddress();
   }, [username]);
 
-  useEffect(() => {
-    const fetchPayment = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_REACT_APP_API_URL}/banks`
-        );
-        if (response.data) {
-          const data = response.data.banks;
-          if (Array.isArray(data)) {
-            setPaymentMethod(data);
-          } else {
-            setError("Unexpected response format");
-          }
-        }
-      } catch (error) {
-        setError("Failed to fetch data payment");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchPayment();
-  }, []);
-
   const formik = useFormik({
     initialValues: {
       recipient_name: "",
@@ -157,16 +127,30 @@ const Order = () => {
           userId,
           username,
           addressId: address._id,
-          paymentMethod: selectedPayment,
           totalPrice,
         };
+
         console.log("response orderData = ", orderData);
         const response = await axios.post(
           `${import.meta.env.VITE_REACT_APP_API_URL}/order`,
           orderData
         );
         if (response.data.success) {
-          Swal.fire({ icon: "success", title: "Create Order Successful" });
+          const snapToken = response.data.midtransToken;
+          window.snap.pay(snapToken, {
+            onSuccess: function (result) {
+              Swal.fire({ icon: "success", title: "Payment Successful" });
+            },
+            onPending: function (result) {
+              Swal.fire({ icon: "info", title: "Payment Pending" });
+            },
+            onError: function (result) {
+              Swal.fire({ icon: "error", title: "Payment Failed" });
+            },
+            onClose: function () {
+              Swal.fire({ icon: "warning", title: "Payment Canceled" });
+            },
+          });
         } else {
           Swal.fire({
             icon: "error",
@@ -408,77 +392,10 @@ const Order = () => {
                   </div>
                   <div className="border border-solid dark:border-slate-600 border-gray-600" />
                   <div className="flex flex-col my-9">
-                    <Button onClick={() => setOpenModalPayment(true)}>
+                    <Button onClick={formik.handleSubmit}>
                       <CiLock className="size-5 mx-2" />
-                      Select Payment Method
+                      Pay
                     </Button>
-                    <Modal
-                      show={openModalPayment}
-                      onClose={() => {
-                        setOpenModalPayment(false);
-                      }}
-                    >
-                      <ModalHeader>Select Payment</ModalHeader>
-                      <ModalBody>
-                        <div className="flex flex-col justify-between text-black dark:text-white space-y-5">
-                          <h1 className="text-xl mb-5">Payment Method</h1>
-                          {isLoading && <p>Loading...</p>}
-                          {error && <p className="text-red-500">{error}</p>}
-                          {!isLoading && !error && paymentMethod.length > 0 ? (
-                            <div className="flex flex-col space-y-5">
-                              {paymentMethod.map((payment) => (
-                                <div key={payment._id}>
-                                  <div className="flex justify-between mx-10">
-                                    <div className="flex items-center space-x-10">
-                                      <img
-                                        className="max-w-[100px]"
-                                        src={payment.logo}
-                                        alt={payment.bank}
-                                      />
-                                    </div>
-                                    <div className="flex items-center">
-                                      <Radio
-                                        name="paymentMethod"
-                                        value={payment.bank}
-                                        checked={
-                                          selectedPayment === payment.bank
-                                        }
-                                        onChange={() =>
-                                          setSelectedPayment(payment.bank)
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            !isLoading &&
-                            !error && <p>No payment methods available.</p>
-                          )}
-                          <div className="flex flex-col">
-                            <h1 className="text-lg mt-5 mb-3">
-                              Payment Summaries
-                            </h1>
-                            <div className="border border-solid dark:border-slate-600 border-gray-600" />
-                            <div className="flex justify-between my-5">
-                              <h2>Shipping Price</h2>
-                              <h2>Free</h2>
-                            </div>
-                            <div className="flex justify-between">
-                              <h2>Total Price</h2>
-                              <h2>${calculateSubtotal()}</h2>
-                            </div>
-                          </div>
-                          <Button
-                            className="my-2"
-                            onClick={formik.handleSubmit}
-                          >
-                            Pay Now
-                          </Button>
-                        </div>
-                      </ModalBody>
-                    </Modal>
                   </div>
                 </div>
               </div>

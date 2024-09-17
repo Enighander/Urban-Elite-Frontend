@@ -3,11 +3,17 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 
+import.meta.env.VITE_MIDTRANS_CLIENT_KEY && (() => {
+  const script = document.createElement('script');
+  script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+  script.setAttribute('data-client-key', import.meta.env.VITE_MIDTRANS_CLIENT_KEY);
+  document.head.appendChild(script);
+})();
+
+document.body.classList.add("bg-gray-200", "dark:bg-gray-900", "text-black", "dark:text-white");
+
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <>
-    <body className="bg-gray-200 dark:bg-gray-900 text-black dark:text-white">
-      <App />
-    </body>
-  </>
-  
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
 );

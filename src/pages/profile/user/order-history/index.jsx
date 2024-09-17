@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import NavbarLogin from "../../../../components/navbar/login";
 import FooterComponent from "../../../../components/footer/footer";
-import Error404 from "../../../../components/error/404";
+import Swal from "sweetalert2";
 import {
   Breadcrumb,
   Pagination,
@@ -25,8 +25,6 @@ const OrderHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [openModalDetails, setOpenModalDetails] = useState(false);
-  const [showConfirmPayment, setShowConfirmPayment] = useState(false);
-  const [openModalConfirmPayment, setOpenModalConfirmPayment] = useState(false);
   const onPageChange = (page) => setCurrentPage(page);
 
   useEffect(() => {
@@ -99,14 +97,42 @@ const OrderHistory = () => {
     setOpenModalDetails(true);
   };
 
-  const handleConfirmPayment = (order) => {
-    setSelectedOrder(order);
-    if (order.paymentStatus === "pending") {
-      setShowConfirmPayment(true);
-    } else {
-      setShowConfirmPayment(false);
+  const handlePayment = async (orderId) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_API_URL}/order/getMidtransToken`,
+        { orderId }
+      );
+      if (response.data.success) {
+        const { midtransToken } = response.data;
+        window.snap.pay(midtransToken, {
+          onSuccess: function (result) {
+            Swal.fire({ icon: "success", title: "Payment Successful" });
+          },
+          onPending: function (result) {
+            Swal.fire({ icon: "info", title: "Payment Pending" });
+          },
+          onError: function (result) {
+            Swal.fire({ icon: "error", title: "Payment Failed" });
+          },
+          onClose: function () {
+            Swal.fire({ icon: "warning", title: "Payment Canceled" });
+          },
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed to retrieve Midtrans Token",
+        });
+      }
+    } catch (error) {
+      console.error("Error getting midtrans token: ", error);
+      Swal.fire({
+        icon: "error",
+        title: "An error occurred",
+        text: "Failed to initiate payment",
+      });
     }
-    setOpenModalConfirmPayment(true)
   };
 
   const PaymentStatus = ({ status }) => {
@@ -177,12 +203,6 @@ const OrderHistory = () => {
                             </span>
                           </div>
                           <div className="flex flex-col space-y-4">
-                            <h1 className="text-left">Payment</h1>
-                            <span className="text-left">
-                              {item.paymentMethod}
-                            </span>
-                          </div>
-                          <div className="flex flex-col space-y-4">
                             <h1 className="text-left">Status</h1>
                             <PaymentStatus status={item.paymentStatus} />
                           </div>
@@ -203,9 +223,9 @@ const OrderHistory = () => {
                                 <Button
                                   size="xs"
                                   color="yellow"
-                                  onClick={() => handleConfirmPayment(item)}
+                                  onClick={() => handlePayment(item._id)}
                                 >
-                                  Confirm Payment
+                                  Select Payment
                                 </Button>
                               )}
                             </div>
@@ -300,33 +320,11 @@ const OrderHistory = () => {
                                           </span>
                                           <span>{address.phone_number}</span>
                                         </div>
-                                        <div className="flex flex-col">
-                                          {showConfirmPayment && (
-                                            <div>
-                                              <Button
-                                                color="yellow"
-                                                onClick={() =>
-                                                  alert("Confirm Payment")
-                                                }
-                                              >
-                                                Confirm Payment
-                                              </Button>
-                                            </div>
-                                          )}
-                                        </div>
                                       </div>
                                     </div>
                                   </>
                                 )}
                               </ModalBody>
-                            </Modal>
-                            <Modal
-                              show={openModalConfirmPayment}
-                              onClose={() => setOpenModalConfirmPayment(false)}
-                            >
-                              <Modal.Header>
-                                Confirm Payment
-                              </Modal.Header>
                             </Modal>
                           </div>
                         </div>
