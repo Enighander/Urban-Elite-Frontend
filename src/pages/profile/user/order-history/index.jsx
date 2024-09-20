@@ -104,33 +104,43 @@ const OrderHistory = () => {
         { orderId }
       );
       if (response.data.success) {
-        const { midtransToken } = response.data;
-        window.snap.pay(midtransToken, {
-          onSuccess: function (result) {
-            Swal.fire({ icon: "success", title: "Payment Successful" });
-          },
-          onPending: function (result) {
-            Swal.fire({ icon: "info", title: "Payment Pending" });
-          },
-          onError: function (result) {
-            Swal.fire({ icon: "error", title: "Payment Failed" });
-          },
-          onClose: function () {
-            Swal.fire({ icon: "warning", title: "Payment Canceled" });
-          },
-        });
+        const midtransToken = response.data.midtransToken;
+        if (typeof window.snap !== "undefined") {
+          window.snap.pay(midtransToken, {
+            onSuccess: function (result) {
+              Swal.fire({ icon: "success", title: "Payment Successful" });
+            },
+            onPending: function (result) {
+              Swal.fire({ icon: "info", title: "Payment Pending" });
+            },
+            onError: function (result) {
+              Swal.fire({ icon: "error", title: "Payment Failed" });
+            },
+            onClose: function () {
+              Swal.fire({ icon: "warning", title: "Payment Canceled" });
+            },
+          });
+        } else {
+          console.error("Midtrans snap.js is not available.");
+          Swal.fire({
+            icon: "error",
+            title: "Payment Error",
+            text: "Payment service is currently unavailable.",
+          });
+        }
       } else {
         Swal.fire({
           icon: "error",
-          title: "Failed to retrieve Midtrans Token",
+          title: "Payment Error",
+          text: response.data.message,
         });
       }
     } catch (error) {
-      console.error("Error getting midtrans token: ", error);
+      console.error("Error during payment process: ", error);
       Swal.fire({
         icon: "error",
-        title: "An error occurred",
-        text: "Failed to initiate payment",
+        title: "Payment Error",
+        text: "Something went wrong during payment.",
       });
     }
   };
