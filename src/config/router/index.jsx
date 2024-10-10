@@ -32,7 +32,7 @@ const Router = () => {
             <Route path="/cart" element={<Cart/>}/>
             <Route path='/products' element={<AllProducts/>} />
             <Route path='/order' element={<Order/>} />
-            <Route path="/products/name/:name" element={<Products />} />
+            <Route path="/products/details/:id" element={<Products />} />
             <Route path="/products/categories/:name" element={<CategoryProduct/>} />
             <Route path="/products/best-seller" element={<ProductBestSeller/>} />
             {/* User */}

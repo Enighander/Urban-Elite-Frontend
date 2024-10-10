@@ -82,6 +82,14 @@ const CartPage = () => {
     }
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+  
   const calculateSubtotal = () => {
     if (!Array.isArray(cart)) return 0;
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -146,7 +154,7 @@ const CartPage = () => {
                     </h2>
                   </div>
                   <div className="flex items-center mt-5 col-start-4">
-                    <h2 className="text-left 2xl: ml-3">$ {item.price}</h2>
+                    <h2 className="text-left 2xl: ml-3">{formatPrice(item.price)}</h2>
                   </div>
                   <div className="flex items-center mt-5 col-start-5 2xl: ml-3">
                     <Button
@@ -171,7 +179,7 @@ const CartPage = () => {
                   </div>
                   <div className="flex items-center mt-5 col-start-8">
                     <h2 className="text-left 2xl: ml-24">
-                      $ {item.price * item.quantity}
+                       {formatPrice(item.price * item.quantity)}
                     </h2>
                   </div>
                 </div>
@@ -206,7 +214,7 @@ const CartPage = () => {
                 <div className="grid grid-cols-3 gap-2">
                   <h1>Subtotal</h1>
                   <h1>:</h1>
-                  <h1 className="text-center">${calculateSubtotal()}</h1>
+                  <h1 className="text-center">{formatPrice(calculateSubtotal())}</h1>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <h1>Shipping</h1>
@@ -216,7 +224,7 @@ const CartPage = () => {
                 <div className="grid grid-cols-3 gap-2">
                   <h1>Total</h1>
                   <h1>:</h1>
-                  <h1 className="text-center">${calculateSubtotal()}</h1>
+                  <h1 className="text-center">{formatPrice(calculateSubtotal())}</h1>
                 </div>
               </div>
             </div>

@@ -44,12 +44,16 @@ const FlashSale = () => {
       return;
     }
 
+    const finalPrice = product.discountPrice
+      ? product.discountPrice
+      : product.price;
+
     const data = {
       quantity: 1,
       product_name: product.name,
       productId: product._id,
       image_product: product.image,
-      price: product.price,
+      price: finalPrice,
       color: product.color,
       size: product.size,
       userId: userId,
@@ -66,6 +70,14 @@ const FlashSale = () => {
       console.error("Error Creating Order:", error);
       toast.error("Failed to add item to the cart");
     }
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(price);
   };
 
   return (
@@ -91,9 +103,11 @@ const FlashSale = () => {
                 className="max-w-xs max-h-full"
                 imgAlt={`Product ${product.name}`}
                 imgSrc={product.image}
-                key={product.id}
+                key={product._id}
               >
-                <Link to={`/products/name/${product.name.replace(/ /g, "-")}`}>
+                
+                <Link to={`/products/details/${product._id}`}>
+                {/* <Link to={`/products/name/${product.name.replace(/ /g, "-")}`}> */}
                   <h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
                     {product.name}
                   </h5>
@@ -114,27 +128,32 @@ const FlashSale = () => {
                     5.0
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col justify-between space-y-5">
                   {product.discountPrice ? (
-                    <>
-                      <span className="text-2xl font-bold text-gray-500 dark:text-gray-400 line-through">
-                        ${product.price}
+                    <div className="flex flex-col">
+                      <span className="text-xl text-left font-bold text-gray-500 dark:text-gray-400 line-through">
+                        {formatPrice(product.price)}
                       </span>
-                      <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                        ${product.discountPrice}
+                      <span className="text-xl text-left font-bold text-gray-900 dark:text-white">
+                        {formatPrice(product.discountPrice)}
                       </span>
-                    </>
+                    </div>
                   ) : (
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                      ${product.price}
+                    <span className="text-xl text-left font-bold text-gray-900 dark:text-white">
+                      {formatPrice(product.price)}
                     </span>
                   )}
-                  <a
-                    onClick={() => handleAddToCart(product)}
-                    className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
-                  >
-                    Add to cart
-                  </a>
+                  <div className="flex justify-between">
+                    <a
+                      onClick={() => handleAddToCart(product)}
+                      className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                    >
+                      Add to cart
+                    </a>
+                    <a className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
+                      Buy Now
+                    </a>
+                  </div>
                 </div>
               </Card>
             ))

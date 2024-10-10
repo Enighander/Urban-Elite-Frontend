@@ -1,5 +1,4 @@
 import React from "react";
-import { MdPayment } from "react-icons/md";
 import { ImProfile, ImAddressBook } from "react-icons/im";
 import { SlReload } from "react-icons/sl";
 import { TiCancel } from "react-icons/ti";
@@ -27,12 +26,12 @@ const SidebarProfile = () => {
                 Address Book
               </span>
             </a>
-            <a href={`/profile/user/${userId}/payment-option`} className="flex text-dark group">
+            {/* <a href={`/profile/user/${userId}/payment-option`} className="flex text-dark group">
               <MdPayment className="mx-2 size-6" />
               <span className="group-hover:text-slate-500 mx-2">
                 My Payment Options
               </span>
-            </a>
+            </a> */}
             <a href={`/profile/user/${userId}/change-password`} className="flex text-dark group">
               <RiLockPasswordLine className="mx-2 size-6" />
               <span className="group-hover:text-slate-500 mx-2">

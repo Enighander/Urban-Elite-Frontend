@@ -91,7 +91,6 @@ const OrderHistory = () => {
       </div>
     );
   }
-
   const handleViewDetail = (order) => {
     setSelectedOrder(order);
     setOpenModalDetails(true);
@@ -157,6 +156,9 @@ const OrderHistory = () => {
       case "failed":
         statusColor = "text-red-500";
         break;
+      case "expired":
+        statusColor = "text-red-700";
+        break;
       default:
         statusColor = "text-gray-500 dark:text-white";
     }
@@ -166,6 +168,14 @@ const OrderHistory = () => {
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(price);
   };
 
   return (
@@ -218,7 +228,7 @@ const OrderHistory = () => {
                           </div>
                           <div className="flex flex-col space-y-4">
                             <h1>Total</h1>
-                            <span>${item.totalPrice}</span>
+                            <span>{formatPrice(item.totalPrice)}</span>
                           </div>
 
                           <div className="flex items-center">
@@ -275,9 +285,9 @@ const OrderHistory = () => {
                                             >
                                               <img
                                                 src={product.image_product}
-                                                className="w-14 h-14 object-cover"
+                                                className="w-15 h-16 object-cover"
                                               />
-                                              <div className="flex flex-col mx-5 my-5 w-">
+                                              <div className="flex flex-col mx-5 my-5">
                                                 <span>
                                                   {product.product_name}
                                                 </span>
@@ -285,8 +295,10 @@ const OrderHistory = () => {
                                                   <span>
                                                     x {product.quantity}
                                                   </span>
-                                                  <span>$ {product.price}</span>
                                                 </div>
+                                                <span>
+                                                  {formatPrice(product.price)}
+                                                </span>
                                               </div>
                                               <div></div>
                                             </div>
@@ -298,7 +310,9 @@ const OrderHistory = () => {
                                               Sub Total
                                             </h2>
                                             <h2 className="text-md">
-                                              $ {selectedOrder.totalPrice}
+                                              {formatPrice(
+                                                selectedOrder.totalPrice
+                                              )}
                                             </h2>
                                           </div>
                                           <div className="flex justify-between">
@@ -312,7 +326,9 @@ const OrderHistory = () => {
                                               Total Price
                                             </h2>
                                             <h2 className="text-md">
-                                              $ {selectedOrder.totalPrice}
+                                              {formatPrice(
+                                                selectedOrder.totalPrice
+                                              )}
                                             </h2>
                                           </div>
                                         </div>

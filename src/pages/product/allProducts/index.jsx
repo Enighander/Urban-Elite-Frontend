@@ -32,9 +32,7 @@ const AllProducts = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          `${
-            import.meta.env.VITE_REACT_APP_API_URL
-          }/products`
+          `${import.meta.env.VITE_REACT_APP_API_URL}/products`
         );
         if (response.data) {
           const data = response.data.products;
@@ -112,11 +110,14 @@ const AllProducts = () => {
                   className="max-w-xs max-h-full"
                   imgAlt={`Product ${product.name}`}
                   imgSrc={product.image}
-                  key={product.id}
+                  key={product._id}
                 >
-                  <Link
+                  {/* <Link
                     to={`/products/name/${product.name.replace(/ /g, "-")}`}
-                  >
+                  > */}
+                    <Link
+                      to={`/products/${product._id}`}
+                    >
                     <h5 className="text-sm font-semibold tracking-tight text-gray-900 dark:text-white h-16 p-5">
                       {product.name}
                     </h5>

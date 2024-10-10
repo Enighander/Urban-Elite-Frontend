@@ -12,7 +12,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ProductDetail = () => {
-  const { name, _id, color, size } = useParams();
+  const { name, id, color, size } = useParams();
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const username = localStorage.getItem("username");
@@ -22,14 +22,14 @@ const ProductDetail = () => {
   const [showNavbarLogin, setShowNavbarLogin] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [data, setData] = useState({
-    quantity,
+    quantity: quantity,
     product_name: name,
-    productId: _id,
+    productId: id,
     image_product: "",
     price: 0,
     color: color,
     size: size,
-    user_id: userId,
+    userId: userId,
     username: username,
   });
 
@@ -46,18 +46,14 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_REACT_APP_API_URL}/products/name/${name}`
+          `${import.meta.env.VITE_REACT_APP_API_URL}/products/details/${id}`
         );
-        if (
-          response.data &&
-          response.data.product &&
-          response.data.product.length > 0
-        ) {
-          const productData = response.data.product[0];
+        if (response.data && response.data.product) {
+          const productData = response.data.product;
           setProduct(productData);
           setData((prevData) => ({
             ...prevData,
-            product_id: productData._id,
+            productId: productData.id,
             product_name: productData.name,
             image_product: productData.image,
             color: productData.color,
@@ -74,7 +70,7 @@ const ProductDetail = () => {
       }
     };
     fetchProduct();
-  }, [name]);
+  }, [id]);
 
   useEffect(() => {
     setData((prevData) => ({
@@ -107,6 +103,14 @@ const ProductDetail = () => {
     }
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
   return (
     <>
       <ToastContainer position="bottom-right" autoClose={5000} />
@@ -128,11 +132,11 @@ const ProductDetail = () => {
             </Breadcrumb.Item>
             <Breadcrumb.Item>{product.name}</Breadcrumb.Item>
           </Breadcrumb>
-          <div className="grid grid-cols-5 grid-rows-5 my-5">
+          <div className="grid grid-cols-5 grid-rows-5 my-10">
             <div className="col-span-3 row-span-4">
               <div className="flex items-start justify-center">
                 <img
-                  className="w-auto h-auto"
+                  className="w-[500px] 2xl:mt-5 2xl:w-[600px]"
                   src={product.image}
                   alt={product.name}
                 />
@@ -156,22 +160,22 @@ const ProductDetail = () => {
                 {product.discountPrice ? (
                   <>
                     <h1 className="text-xl text-gray-500 dark:text-gray-400 line-through">
-                      ${product.price}
+                      {formatPrice(product.price)}
                     </h1>
                     <h1 className="text-xl text-gray-900 dark:text-white">
-                      ${product.discountPrice}
+                      {formatPrice(product.discountPrice)}
                     </h1>
                   </>
                 ) : (
                   <h1 className="text-xl text-gray-900 dark:text-white">
-                    ${product.price}
+                    {formatPrice(product.price)}
                   </h1>
                 )}
               </div>
               <h5 className="text-justify mt-5">{product.description}</h5>
               <div className="flex flex-col items-start">
                 <div className="opacity-50 inline-flex w-full items-center">
-                  <div className="w-7/12 border border-black"></div>
+                  <div className="w-7/12 border border-black dark:border-white"></div>
                 </div>
               </div>
               <div className="flex items-start space-x-2">
@@ -180,39 +184,39 @@ const ProductDetail = () => {
               </div>
               <div className="flex items-start space-x-2">
                 <h1>Size:</h1>
-                <button className="ml-5">1</button>
+                <button className="ml-5">{product.size}</button>
               </div>
               <div className="flex items-center space-x-5">
-                <div className="flex items-stretch border border-black/50">
+                <div className="flex items-stretch border border-black/50 dark:border-white/50">
                   <button
-                    className="w-14 h-10 flex items-center justify-center border-r border-black/50"
+                    className="w-14 h-10 flex items-center justify-center border-r border-black/50 dark:border-white/50"
                     onClick={handleDecrement}
                   >
                     -
                   </button>
-                  <div className="w-10 h-10 flex items-center justify-center border-x border-black/50">
-                    <span className="text-black text-xl leading-7">
+                  <div className="w-10 h-10 flex items-center justify-center border-x border-black/50 dark:border-white/50">
+                    <span className="dark: text-light text-xl leading-7">
                       {quantity}
                     </span>
                   </div>
                   <button
-                    className="w-14 h-10 flex items-center justify-center border-l border-black/50"
+                    className="w-14 h-10 flex items-center justify-center border-l border-black/50 dark:border-white/50 "
                     onClick={handleIncrement}
                   >
                     +
                   </button>
                 </div>
-                <button className="w-auto h-10 flex items-center justify-center px-2 border border-solid border-black/50">
+                <button className="w-auto h-10 flex items-center justify-center px-2 border border-solid border-black/50 dark:border-white/50">
                   Buy now
                 </button>
                 <button
-                  className="w-auto h-10 flex items-center justify-center px-2 border border-solid border-black/50"
+                  className="w-auto h-10 flex items-center justify-center px-2 border border-solid border-black/50 dark:border-white/50"
                   onClick={handleAddCart}
                 >
                   Add To Cart
                 </button>
               </div>
-              <div className="w-7/12 flex items-center px-5 py-5 border border-black/50 space-x-2">
+              <div className="w-7/12 flex items-center px-5 py-5 border border-black/50 dark:border-white/50 space-x-2">
                 <FaTruckFast className="w-10 h-5" />
                 <div className="flex flex-col text-left">
                   <h5>Free Delivery</h5>
@@ -221,7 +225,7 @@ const ProductDetail = () => {
                   </a>
                 </div>
               </div>
-              <div className="w-7/12 flex items-center px-5 py-5 border border-black/50 space-x-2">
+              <div className="w-7/12 flex items-center px-5 py-5 border border-black/50 dark:border-white/50 space-x-2">
                 <FaRecycle className="w-10 h-5" />
                 <div className="flex flex-col text-left">
                   <h5>Return Delivery</h5>

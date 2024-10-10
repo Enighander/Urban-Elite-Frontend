@@ -2,13 +2,7 @@ import React, { useEffect, useState } from "react";
 import NavbarLogin from "../../components/navbar/login";
 import FooterComponent from "../../components/footer/footer";
 import Swal from "sweetalert2";
-import {
-  Breadcrumb,
-  Button,
-  Label,
-  TextInput,
-  Spinner,
-} from "flowbite-react";
+import { Breadcrumb, Button, Label, TextInput, Spinner } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import { CiLock } from "react-icons/ci";
 import { useFormik } from "formik";
@@ -117,62 +111,86 @@ const Order = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async () => {
-      setIsLoading(true);
+      setIsLoading(true); 
       try {
-        const totalPrice = cart.reduce(
-          (total, item) => total + item.price * item.quantity,
-          0
-        );
+        const itemDetails = cart.map((item) => ({
+          id: item._id,
+          price: item.price,
+          quantity: item.quantity,
+          name: item.product_name,
+        }));
+
         const orderData = {
           userId,
           username,
           addressId: address._id,
-          totalPrice,
+          item_details: itemDetails,
         };
 
-        console.log("response orderData = ", orderData);
+        console.log("Sending Order Data:", orderData);
+
         const response = await axios.post(
           `${import.meta.env.VITE_REACT_APP_API_URL}/order`,
           orderData
         );
         if (response.data.success) {
           const snapToken = response.data.midtransToken;
+
           window.snap.pay(snapToken, {
             onSuccess: function (result) {
               Swal.fire({ icon: "success", title: "Payment Successful" });
+              console.log("Payment Success:", result);
             },
             onPending: function (result) {
               Swal.fire({ icon: "info", title: "Payment Pending" });
+              console.log("Payment Pending:", result);
             },
             onError: function (result) {
-              Swal.fire({ icon: "error", title: "Payment Failed" });
+              Swal.fire({
+                icon: "error",
+                title: "Payment Failed",
+                text: result.message || "An error occurred during payment.",
+              });
+              console.error("Payment Error Details:", result);
             },
             onClose: function () {
               Swal.fire({ icon: "warning", title: "Payment Canceled" });
+              console.log("Payment Closed by User");
             },
           });
         } else {
           Swal.fire({
             icon: "error",
             title: "Create Order Failed",
-            text: "Unexpected response from server.",
+            text: response.data.message || "Unexpected response from server.",
           });
         }
       } catch (error) {
-        console.error("Error during order submission: ", error);
+        console.error("Error during order submission:", error);
+
         const errorMessage =
           error.response?.data?.message ||
-          "An error occurred during the create payment. Please try again later.";
+          error.message ||
+          "An error occurred during the order process. Please try again later.";
+
         Swal.fire({
           icon: "error",
           title: "Order Error",
           text: errorMessage,
         });
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); 
       }
     },
   });
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
 
   const calculateSubtotal = () => {
     if (!Array.isArray(cart)) return 0;
@@ -196,7 +214,7 @@ const Order = () => {
             Home
           </Breadcrumb.Item>
           <Breadcrumb.Item href="/cart">Cart</Breadcrumb.Item>
-          <Breadcrumb.Item href={`/order`}>Order</Breadcrumb.Item>
+          <Breadcrumb.Item href="/order">Order</Breadcrumb.Item>
         </Breadcrumb>
       </div>
       <form onSubmit={formik.handleSubmit}>
@@ -226,7 +244,7 @@ const Order = () => {
                               <h1>ID</h1>
                               <h1 className=" 2xl:-ml-6 ">:</h1>
                               <h1 className="whitespace-nowrap flex items-center text-xs 2xl:text-lg -ml-10 2xl:-ml-20">
-                                {item.productId}
+                                {item._id.slice(0, 8)}
                               </h1>
                             </div>
                             <div className="grid grid-cols-3 -ml-12 2xl:-ml-16">
@@ -258,7 +276,7 @@ const Order = () => {
                             <div className="grid grid-cols-3">
                               <h1>Price </h1>
                               <h1>:</h1>
-                              <h1>$ {item.price}</h1>
+                              <h1>{formatPrice(calculateSubtotal())}</h1>
                             </div>
                           </div>
                         </div>
@@ -269,7 +287,9 @@ const Order = () => {
                     </div>
                     <div className="flex flex-row justify-between my-5 text-md">
                       <h1 className="">Subtotal Price</h1>
-                      <h1 className="mr-14">${calculateSubtotal()}</h1>
+                      <h1 className="mr-14">
+                        {formatPrice(calculateSubtotal())}
+                      </h1>
                     </div>
                     <div className="flex flex-row justify-between my-5 text-md">
                       <h1 className="">Shipping</h1>
@@ -278,7 +298,9 @@ const Order = () => {
                     <div className="border border-solid dark:border-slate-600 border-gray-600" />
                     <div className="flex flex-row justify-between my-5 text-md">
                       <h1 className="">Total</h1>
-                      <h1 className="mr-14">${calculateSubtotal()}</h1>
+                      <h1 className="mr-14">
+                        {formatPrice(calculateSubtotal())}
+                      </h1>
                     </div>
                   </>
                 )}
@@ -392,7 +414,7 @@ const Order = () => {
                   </div>
                   <div className="border border-solid dark:border-slate-600 border-gray-600" />
                   <div className="flex flex-col my-9">
-                    <Button onClick={formik.handleSubmit}>
+                    <Button onClick={() => formik.handleSubmit()}>
                       <CiLock className="size-5 mx-2" />
                       Pay
                     </Button>
