@@ -78,6 +78,14 @@ const ProductBestSellers = () => {
       toast.error("Failed to add item to the cart");
     }
   };
+  
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
 
   return (
     <>
@@ -134,7 +142,7 @@ const ProductBestSellers = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                      ${product.price}
+                      {formatPrice(product.price)}
                     </span>
                     <a
                       onClick={() => handleAddToCart(product)}

@@ -176,7 +176,7 @@ const AddressBook = () => {
                   <div className="flex flex-col">
                     <Label className="text-black text-base text-left font-normal mb-2">
                       Recipient Name
-                    </Label>
+                    </Label> 
                     <TextInput
                       id="recipient_name"
                       type="text"

@@ -82,6 +82,14 @@ const AllProducts = () => {
     }
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
   return (
     <>
       <ToastContainer position="bottom-right" autoClose={5000} />
@@ -140,7 +148,7 @@ const AllProducts = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                      ${product.price}
+                      {formatPrice(product.price)}
                     </span>
                     <button
                       onClick={() => handleAddToCart(product)}

@@ -2,7 +2,15 @@ import React, { useEffect, useState } from "react";
 import NavbarLogin from "../../components/navbar/login";
 import FooterComponent from "../../components/footer/footer";
 import Swal from "sweetalert2";
-import { Breadcrumb, Button, Label, TextInput, Spinner } from "flowbite-react";
+import {
+  Breadcrumb,
+  Button,
+  Label,
+  TextInput,
+  Spinner,
+  Checkbox,
+  Modal,
+} from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import { CiLock } from "react-icons/ci";
 import { useFormik } from "formik";
@@ -36,10 +44,12 @@ const validationSchema = Yup.object({
 const Order = () => {
   const userId = localStorage.getItem("userId");
   const username = localStorage.getItem("username");
-  const [address, setAddress] = useState([]);
+  const [address, setAddress] = useState(null);
   const [cart, setCart] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [openModalAddress, setOpenModalAddress] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -63,43 +73,99 @@ const Order = () => {
     fetchCart();
   }, [userId]);
 
+  const handleCheckChange = (e) => {
+    setIsChecked(e.target.checked);
+  };
+
   useEffect(() => {
-    const fetchUserAddress = async () => {
+    if (isChecked) {
+      const fetchUserAddress = async () => {
+        setIsLoading(true);
+        try {
+          const response = await axios.get(
+            `${
+              import.meta.env.VITE_REACT_APP_API_URL
+            }/address/username/${username}`
+          );
+          if (response.data && response.data.address) {
+            formik.setFieldValue(
+              "recipient_name",
+              response.data.address.recipient_name || ""
+            );
+            formik.setFieldValue(
+              "postal_code",
+              response.data.address.postal_code || ""
+            );
+            formik.setFieldValue("city", response.data.address.city || "");
+            formik.setFieldValue(
+              "address",
+              response.data.address.address || ""
+            );
+            formik.setFieldValue(
+              "phone_number",
+              response.data.address.phone_number || ""
+            );
+          } else {
+            console.error("Invalid address data:", response.data.address);
+            setAddress(null);
+          }
+        } catch (error) {
+          console.error("Failed to fetch address data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      // Panggil fetch address
+      fetchUserAddress();
+    }
+  }, [isChecked, username]);
+
+  const formikChangeAddress = useFormik({
+    initialValues: {
+      username: username,
+      recipient_name: "",
+      address: "",
+      postal_code: "",
+      city: "",
+      phone_number: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
       setIsLoading(true);
       try {
-        const response = await axios.get(
+        const response = await axios.put(
           `${
             import.meta.env.VITE_REACT_APP_API_URL
-          }/address/username/${username}`
+          }/address/username/${username}`,
+          values
         );
-        if (response.data && response.data.address) {
-          setAddress(response.data.address);
-          formik.setFieldValue(
-            "recipient_name",
-            response.data.address.recipient_name
-          );
-          formik.setFieldValue(
-            "postal_code",
-            response.data.address.postal_code
-          );
-          formik.setFieldValue("city", response.data.address.city);
-          formik.setFieldValue("address", response.data.address.address);
-          formik.setFieldValue(
-            "phone_number",
-            response.data.address.phone_number
-          );
+        if (response.data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Update Successful",
+          });
         } else {
-          console.error("invalid address data:", response.data.address);
-          setAddress([]);
+          Swal.fire({
+            icon: "error",
+            title: "Update Failed",
+            text: "Unexpected response from server.",
+          });
         }
       } catch (error) {
-        console.error("failed to fetch address data:", error);
+        const errorMessage =
+          error.response?.data?.message ||
+          "An error occurred during the update. Please try again later.";
+        Swal.fire({
+          icon: "error",
+          title: "Update Error",
+          text: errorMessage,
+        });
       } finally {
         setIsLoading(false);
       }
-    };
-    fetchUserAddress();
-  }, [username]);
+    }
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -111,7 +177,7 @@ const Order = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async () => {
-      setIsLoading(true); 
+      setIsLoading(true);
       try {
         const itemDetails = cart.map((item) => ({
           id: item._id,
@@ -123,8 +189,12 @@ const Order = () => {
         const orderData = {
           userId,
           username,
-          addressId: address._id,
           item_details: itemDetails,
+          recipient_name: formik.values.recipient_name,
+          address: formik.values.address,
+          postal_code: formik.values.postal_code,
+          city: formik.values.city,
+          phone_number: formik.values.phone_number,
         };
 
         console.log("Sending Order Data:", orderData);
@@ -179,7 +249,7 @@ const Order = () => {
           text: errorMessage,
         });
       } finally {
-        setIsLoading(false); 
+        setIsLoading(false);
       }
     },
   });
@@ -239,7 +309,7 @@ const Order = () => {
                               alt={item.product_name}
                             />
                           </div>
-                          <div className="mr-20 mt-2 row-span-2 space-y-5 text-left text-sm 2xl:text-lg 2xl:mt-4 ">
+                          <div className="mr-20 mt-2 row-span-2 space-y-5 text-left text-sm 2xl:text-lg 2xl:mt-4">
                             <div className="grid grid-cols-3 -ml-12 2xl:-ml-16">
                               <h1>ID</h1>
                               <h1 className=" 2xl:-ml-6 ">:</h1>
@@ -276,7 +346,7 @@ const Order = () => {
                             <div className="grid grid-cols-3">
                               <h1>Price </h1>
                               <h1>:</h1>
-                              <h1>{formatPrice(calculateSubtotal())}</h1>
+                              <h1>{formatPrice(item.price * item.quantity)}</h1>
                             </div>
                           </div>
                         </div>
@@ -285,18 +355,18 @@ const Order = () => {
                     <div className="flex my-5">
                       <h1 className="text-2xl">Summary</h1>
                     </div>
-                    <div className="flex flex-row justify-between my-5 text-md">
+                    <div className="flex flex-row justify-between my-5 2xl:text-lg text-sm">
                       <h1 className="">Subtotal Price</h1>
                       <h1 className="mr-14">
                         {formatPrice(calculateSubtotal())}
                       </h1>
                     </div>
-                    <div className="flex flex-row justify-between my-5 text-md">
+                    <div className="flex flex-row justify-between my-5 2xl:text-lg text-sm">
                       <h1 className="">Shipping</h1>
                       <h1 className="mr-14">$0</h1>
                     </div>
                     <div className="border border-solid dark:border-slate-600 border-gray-600" />
-                    <div className="flex flex-row justify-between my-5 text-md">
+                    <div className="flex flex-row justify-between my-5 2xl:text-lg text-sm">
                       <h1 className="">Total</h1>
                       <h1 className="mr-14">
                         {formatPrice(calculateSubtotal())}
@@ -324,7 +394,6 @@ const Order = () => {
                             <TextInput
                               className="2xl:w-[250px]"
                               {...formik.getFieldProps("recipient_name")}
-                              disabled
                             />
                             {formik.touched.recipient_name &&
                             formik.errors.recipient_name ? (
@@ -340,7 +409,6 @@ const Order = () => {
                             <TextInput
                               className="2xl:w-[250px]"
                               {...formik.getFieldProps("phone_number")}
-                              disabled
                             />
                             {formik.touched.phone_number &&
                             formik.errors.phone_number ? (
@@ -357,7 +425,6 @@ const Order = () => {
                           <TextInput
                             className="2xl:w-[520px]"
                             {...formik.getFieldProps("address")}
-                            disabled
                           />
                           {formik.touched.address && formik.errors.address ? (
                             <div className="text-red-500 text-sm text-left">
@@ -373,7 +440,6 @@ const Order = () => {
                             <TextInput
                               className="2xl:w-[250px]"
                               {...formik.getFieldProps("postal_code")}
-                              disabled
                             />
                             {formik.touched.postal_code &&
                             formik.errors.postal_code ? (
@@ -389,7 +455,6 @@ const Order = () => {
                             <TextInput
                               className="2xl:w-[250px]"
                               {...formik.getFieldProps("city")}
-                              disabled
                             />
                             {formik.touched.city && formik.errors.city ? (
                               <div className="text-red-500 text-sm text-left">
@@ -399,6 +464,168 @@ const Order = () => {
                           </div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between space-x-2 ">
+                    <Button
+                      onClick={() => setOpenModalAddress(true)}
+                      className="text-sm 2xl:text-lg"
+                    >
+                      Change Default Address
+                    </Button>
+                    <Modal
+                      show={openModalAddress}
+                      onClose={() => setOpenModalAddress(false)}
+                    >
+                      <Modal.Header>Change Default Address</Modal.Header>
+                      <Modal.Body>
+                        <form onSubmit={formikChangeAddress.handleSubmit}>
+                          <div className="grid grid-cols-2 gap-10 my-5">
+                            <div className="flex flex-col">
+                              <Label className="text-black text-base text-left font-normal mb-2">
+                                Recipient Name
+                              </Label>
+                              <TextInput
+                                id="recipient_name"
+                                type="text"
+                                name="recipient_name"
+                                placeholder="Enter your recipient name"
+                                onChange={formikChangeAddress.handleChange}
+                                onBlur={formikChangeAddress.handleBlur}
+                                color={
+                                  formikChangeAddress.errors.recipient_name
+                                    ? "failure"
+                                    : "gray"
+                                }
+                                helperText={
+                                  formikChangeAddress.errors.recipient_name &&
+                                  formikChangeAddress.touched.recipient_name
+                                    ? formikChangeAddress.errors.recipient_name
+                                    : null
+                                }
+                              />
+                            </div>
+                            <div className="flex flex-col">
+                              <Label className="text-black text-base text-left font-normal mb-2">
+                                Address
+                              </Label>
+                              <TextInput
+                                id="address"
+                                type="text"
+                                name="address"
+                                placeholder="Enter your address"
+                                onChange={formikChangeAddress.handleChange}
+                                onBlur={formikChangeAddress.handleBlur}
+                                color={
+                                  formikChangeAddress.errors.address
+                                    ? "failure"
+                                    : "gray"
+                                }
+                                helperText={
+                                  formikChangeAddress.errors.address &&
+                                  formikChangeAddress.touched.address
+                                    ? formikChangeAddress.errors.address
+                                    : null
+                                }
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-10">
+                            <div className="flex flex-col">
+                              <Label className="text-black text-base text-left font-normal mb-2">
+                                Postal Code
+                              </Label>
+                              <TextInput
+                                id="postal_code"
+                                type="text"
+                                name="postal_code"
+                                placeholder="Enter your postal code"
+                                onChange={formikChangeAddress.handleChange}
+                                onBlur={formikChangeAddress.handleBlur}
+                                color={
+                                  formikChangeAddress.errors.postal_code
+                                    ? "failure"
+                                    : "gray"
+                                }
+                                helperText={
+                                  formikChangeAddress.errors.postal_code &&
+                                  formikChangeAddress.touched.postal_code
+                                    ? formikChangeAddress.errors.postal_code
+                                    : null
+                                }
+                              />
+                            </div>
+                            <div className="flex flex-col">
+                              <Label className="text-black text-base text-left font-normal mb-2">
+                                City
+                              </Label>
+                              <TextInput
+                                id="city"
+                                type="text"
+                                name="city"
+                                placeholder="Enter your city"
+                                onChange={formikChangeAddress.handleChange}
+                                onBlur={formikChangeAddress.handleBlur}
+                                color={
+                                  formikChangeAddress.errors.city
+                                    ? "failure"
+                                    : "gray"
+                                }
+                                helperText={
+                                  formikChangeAddress.errors.city &&
+                                  formikChangeAddress.touched.city
+                                    ? formikChangeAddress.errors.city
+                                    : null
+                                }
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-10 my-5">
+                            <div className="flex flex-col">
+                              <Label className="text-black text-base text-left font-normal mb-2">
+                                Phone Number
+                              </Label>
+                              <TextInput
+                                id="phone_number"
+                                type="text"
+                                name="phone_number"
+                                placeholder="Enter your phone number"
+                                onChange={formikChangeAddress.handleChange}
+                                onBlur={formikChangeAddress.handleBlur}
+                                color={
+                                  formikChangeAddress.errors.phone_number
+                                    ? "failure"
+                                    : "gray"
+                                }
+                                helperText={
+                                  formikChangeAddress.errors.phone_number &&
+                                  formikChangeAddress.touched.phone_number
+                                    ? formikChangeAddress.errors.phone_number
+                                    : null
+                                }
+                              />
+                            </div>
+                          </div>
+                          <div className="flex justify-end items-center gap-8 mt-8">
+                            <Button
+                              type="submit"
+                              className="px-12 py-4 rounded text-base font-medium"
+                              color="light"
+                            >
+                              {isLoading ? <Spinner /> : "Save Address"}
+                            </Button>
+                          </div>
+                        </form>
+                      </Modal.Body>
+                    </Modal>
+                    <div className="space-x-4 items-center">
+                      <Checkbox
+                        checked={isChecked}
+                        onChange={handleCheckChange}
+                      />
+                      <span className="text-sm 2xl:text-lg">
+                        Use Default Address
+                      </span>
                     </div>
                   </div>
                 </div>
