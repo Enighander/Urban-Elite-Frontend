@@ -100,14 +100,12 @@ const FlashSale = () => {
           ) : products.length > 0 ? (
             products.map((product) => (
               <Card
-                className="max-w-xs max-h-full"
+                className="md:max-w-64 max-h-full"
                 imgAlt={`Product ${product.name}`}
                 imgSrc={product.image}
                 key={product._id}
               >
-                
                 <Link to={`/products/details/${product._id}`}>
-                {/* <Link to={`/products/name/${product.name.replace(/ /g, "-")}`}> */}
                   <h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
                     {product.name}
                   </h5>
@@ -143,16 +141,16 @@ const FlashSale = () => {
                       {formatPrice(product.price)}
                     </span>
                   )}
-                  <div className="flex justify-between">
-                    <a
+                  <div className="flex justify-between space-x-5">
+                    <button
                       onClick={() => handleAddToCart(product)}
-                      className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                      className="rounded-lg whitespace-nowrap bg-cyan-700 md:w-24 md:h-auto 2xl:px-5 py-2.5 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
                     >
                       Add to cart
-                    </a>
-                    <a className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
+                    </button>
+                    <button className="rounded-lg whitespace-nowrap bg-cyan-700 md:w-24 md:h-auto 2xl:px-5 py-2.5 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
                       Buy Now
-                    </a>
+                    </button>
                   </div>
                 </div>
               </Card>

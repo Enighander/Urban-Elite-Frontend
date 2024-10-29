@@ -11,9 +11,9 @@ const BestSeller = () => {
   const username = localStorage.getItem("username");
   const itemPerPage = 5;
   const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(true);
+  
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -91,7 +91,7 @@ const BestSeller = () => {
         </div>
         <div className="flex justify-between">
           <h1 className="text-4xl my-5">Best Selling Products</h1>
-          <Button color="light" className="w-15 h-10 xl:mr-12 ">
+          <Button color="light" className="w-15 h-10 xl:mr-12">
             <Link to={"/products/best-seller"}> View All </Link>
           </Button>
         </div>
@@ -105,7 +105,7 @@ const BestSeller = () => {
           ) : products.length > 0 ? (
             products.map((product) => (
               <Card
-                className="max-w-xs max-h-full"
+                className="md:max-w-64 max-h-full"
                 imgAlt={`Product ${product.name}`}
                 imgSrc={product.image}
                 key={product._id}
@@ -149,11 +149,11 @@ const BestSeller = () => {
                   <div className="flex justify-between">
                     <a
                       onClick={() => handleAddToCart(product)}
-                      className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                      className="rounded-lg whitespace-nowrap bg-cyan-700 md:w-24 md:h-auto 2xl:px-5 py-2.5 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
                     >
                       Add to cart
                     </a>
-                    <a className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
+                    <a className="rounded-lg whitespace-nowrap bg-cyan-700 md:w-24 md:h-auto 2xl:px-5 py-2.5 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
                       Buy Now
                     </a>
                   </div>

@@ -44,7 +44,7 @@ const Products = () => {
       navigate("/login");
       return;
     }
-    
+
     const finalPrice = product.discountPrice
       ? product.discountPrice
       : product.price;
@@ -86,7 +86,7 @@ const Products = () => {
       <ToastContainer position="bottom-right" autoClose={5000} />
       <div className="lg: ml-14">
         <div className="flex">
-          <h1>Our Products</h1>
+          <h1 className="text-lg">Our Products</h1>
         </div>
         <div className="flex justify-between">
           <h1 className="text-4xl my-5">Explore Our Products</h1>
@@ -101,12 +101,12 @@ const Products = () => {
           ) : products.length > 0 ? (
             products.map((product) => (
               <Card
-                className="max-w-xs max-h-full"
+                className="md:max-w-64 max-h-full"
                 imgAlt={`Product ${product.name}`}
                 imgSrc={product.image}
                 key={product._id}
               >
-                 <Link to={`/products/details/${product._id}`}>
+                <Link to={`/products/details/${product._id}`}>
                   <h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
                     {product.name}
                   </h5>
@@ -138,20 +138,20 @@ const Products = () => {
                       </span>
                     </div>
                   ) : (
-                    <span className="text-xl text-left  font-bold text-gray-900 dark:text-white">
+                    <span className="text-xl text-left font-bold text-gray-900 dark:text-white">
                       {formatPrice(product.price)}
                     </span>
                   )}
-                  <div className="flex justify-between">
-                    <a
+                  <div className="flex justify-between space-x-5">
+                    <button
                       onClick={() => handleAddToCart(product)}
-                      className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                      className="rounded-lg whitespace-nowrap bg-cyan-700 md:w-24 md:h-auto 2xl:px-5 py-2.5 text-center text-sm font-md text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
                     >
                       Add to cart
-                    </a>
-                    <a className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
+                    </button>
+                    <button className="rounded-lg whitespace-nowrap bg-cyan-700 md:w-24 md:h-auto 2xl:px-5 py-2.5 text-center text-sm font-md text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
                       Buy Now
-                    </a>
+                    </button>
                   </div>
                 </div>
               </Card>

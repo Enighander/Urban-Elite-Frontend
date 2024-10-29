@@ -4,7 +4,7 @@ import Navbar from "../../../components/navbar";
 import FooterComponent from "../../../components/footer/footer";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Card, Spinner, Breadcrumb } from "flowbite-react";
+import { Card, Spinner, Breadcrumb, Button } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import Error404 from "../../../components/error/404";
 import { ToastContainer, toast } from "react-toastify";
@@ -115,18 +115,13 @@ const AllProducts = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
               {products.map((product) => (
                 <Card
-                  className="max-w-xs max-h-full"
+                  className="md:max-w-64 max-h-full"
                   imgAlt={`Product ${product.name}`}
                   imgSrc={product.image}
                   key={product._id}
                 >
-                  {/* <Link
-                    to={`/products/name/${product.name.replace(/ /g, "-")}`}
-                  > */}
-                    <Link
-                      to={`/products/${product._id}`}
-                    >
-                    <h5 className="text-sm font-semibold tracking-tight text-gray-900 dark:text-white h-16 p-5">
+                  <Link to={`/products/${product._id}`}>
+                    <h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white text-left">
                       {product.name}
                     </h5>
                   </Link>
@@ -146,16 +141,24 @@ const AllProducts = () => {
                       5.0
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <div className="flex flex-col items-start">
+                    <span className="md:text-xl text-3xl font-bold text-gray-900 dark:text-white">
                       {formatPrice(product.price)}
                     </span>
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
-                    >
-                      Add to cart
-                    </button>
+                    <div className="flex justify-between space-x-5 mt-5">
+                      <Button
+                        onClick={() => handleAddToCart(product)}
+                        className="rounded-lg whitespace-nowrap bg-cyan-700 md:w-24 md:h-auto 2xl:px-5 py-2.5 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                      >
+                        Add to carts
+                      </Button>
+                      <Button
+                        onClick=""
+                        className="rounded-lg whitespace-nowrap bg-cyan-700 md:w-24 md:h-auto 2xl:px-5 py-2.5 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                      >
+                        Buy Now
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
