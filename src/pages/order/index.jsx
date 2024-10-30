@@ -78,6 +78,10 @@ const Order = () => {
   };
 
   useEffect(() => {
+    
+  })
+
+  useEffect(() => {
     if (isChecked) {
       const fetchUserAddress = async () => {
         setIsLoading(true);

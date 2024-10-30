@@ -144,6 +144,35 @@ const OrderHistory = () => {
     }
   };
 
+  const handleCancelOrder = async (orderId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to cancel this order? This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true, 
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, cancel it!",
+      cancelButtonText: "No, keep it",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.delete(
+            `${import.meta.env.VITE_REACT_APP_API_URL}/order/${orderId}`
+          );
+          console.log("data response delete order data", response) 
+          if (response === 200) {
+            Swal.fire("Cancelled!", "Your order has been cancelled.", "success");
+          } else {
+            Swal.fire("Error!", "Failed to cancel the order.", "error");
+          }   
+        } catch (error) {
+          Swal.fire("Error!", "An error occurred while cancelling the order.", "error");
+        }
+      }
+    });
+  };
+
   const PaymentStatus = ({ status }) => {
     let statusColor;
     switch (status) {
@@ -286,9 +315,15 @@ const OrderHistory = () => {
                               )}
                               {item.paymentStatus === "pending" && (
                                 <Button
+<<<<<<< HEAD
                                   size="xs"
                                   color="red"
                                   onClick={() => handleCancelOrder(item._id)}
+=======
+                                size="xs"
+                                color="red"
+                                onClick={() => handleCancelOrder(item._id)}
+>>>>>>> 5c194ddea8085e9146648af0d2984b9fba28c7e3
                                 >
                                   Cancel Order
                                 </Button>
