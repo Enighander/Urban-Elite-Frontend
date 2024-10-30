@@ -170,6 +170,42 @@ const OrderHistory = () => {
     );
   };
 
+  const handleCancelOrder = async (orderId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to cancel this order?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, cancel it!",
+      cancelButtonText: "No, keep it",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.delete(
+            `${import.meta.env.VITE_REACT_APP_API_URL}/order/${orderId}`
+          );
+          if (response.status === 201) {
+            Swal.fire(
+              "Cancelled!",
+              "Your order has been cancelled.",
+              "success"
+            );
+          } else {
+            Swal.fire("Error!", "Failed to cancel the order.", "error");
+          }
+        } catch (error) {
+          Swal.fire(
+            "Error!",
+            "An error occurred while cancelling the order.",
+            "error"
+          );
+        }
+      }
+    });
+  };
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -246,6 +282,15 @@ const OrderHistory = () => {
                                   onClick={() => handlePayment(item._id)}
                                 >
                                   Select Payment
+                                </Button>
+                              )}
+                              {item.paymentStatus === "pending" && (
+                                <Button
+                                  size="xs"
+                                  color="red"
+                                  onClick={() => handleCancelOrder(item._id)}
+                                >
+                                  Cancel Order
                                 </Button>
                               )}
                             </div>
@@ -339,12 +384,17 @@ const OrderHistory = () => {
                                       </h1>
                                       <div className="flex justify-between">
                                         <div className="flex flex-col">
-                                          <span>{address.recipient_name}</span>
                                           <span>
-                                            {address.address} {address.city}{" "}
-                                            {address.postal_code}{" "}
+                                            {selectedOrder.recipient_name}
                                           </span>
-                                          <span>{address.phone_number}</span>
+                                          <span>
+                                            {selectedOrder.address}{" "}
+                                            {selectedOrder.city}{" "}
+                                            {selectedOrder.postal_code}{" "}
+                                          </span>
+                                          <span>
+                                            {selectedOrder.phone_number}
+                                          </span>
                                         </div>
                                       </div>
                                     </div>
