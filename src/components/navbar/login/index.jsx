@@ -8,6 +8,8 @@ import {
 import { CgProfile } from "react-icons/cg";
 import Swal from "sweetalert2";
 import DarkModeToggle from "../../theme/DarkModeToggle";
+import axios from "axios";
+
 
 const NavbarLogin = () => {
   const navigate = useNavigate()
@@ -37,6 +39,21 @@ const NavbarLogin = () => {
     });
   };
 
+  const handleSearchBar = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_API_URL}/products/search`,
+        {
+          params: { name: query },
+        }
+      );
+      setSearchResults(response.data.results);
+      console.log(response.data.results);
+    } catch (error) {
+      console.error("Error fetching search items:", error);
+    }
+  };
+
   return (
     <header>
       <Navbar className="w-full p-5 bg-white shadow">
@@ -50,15 +67,27 @@ const NavbarLogin = () => {
           </div>
           <div className="flex items-center space-x-4 xl:mr-12 lg:-mr-48 md:mr-14">
             <div className="flex relative space-x-2">
-              <input
-                type="text"
-                className="pl-5 pr-3 py-1.5 bg-neutral-100 rounded-full text-xs font-normal text-black placeholder-opacity-50 w-96"
-                placeholder="What are you looking for?"
-              />
+            <div className="flex flex-col mt-1">
+                <input
+                  type="text"
+                  className="pl-5 pr-3 py-1.5 bg-neutral-100 rounded-full text-xs font-normal text-black placeholder-opacity-50 w-96"
+                  placeholder="What are you looking for?"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearchBar()}
+                />
+                <div>
+                  {searchResults.map((item, index) => (
+                    <div key={index} className="p-2 border-b border-gray-200 absolute">
+                      {item.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
               <Button
                 color="light"
                 className="w-10 h-10 rounded-full flex items-center justify-center"
-                onClick={``}
+                onClick={handleSearchBar}
               >
                 <IoSearchOutline className="w-5 h-5 " />
               </Button>
