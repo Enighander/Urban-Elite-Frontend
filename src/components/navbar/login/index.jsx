@@ -1,22 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Dropdown, Navbar } from "flowbite-react";
-import {
-  IoCartOutline,
-  IoSearchOutline,
-} from "react-icons/io5";
+import { IoCartOutline, IoSearchOutline } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
 import Swal from "sweetalert2";
 import DarkModeToggle from "../../theme/DarkModeToggle";
 import axios from "axios";
 
-
 const NavbarLogin = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
-  const adminId = localStorage.getItem("adminId")
+  const adminId = localStorage.getItem("adminId");
   const [isOpen, setIsOpen] = useState(false);
   const userRoleVariable = localStorage.getItem("role");
+  const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [notFound, setNotFound] = useState(false);
+  const searchBarRef = useRef(null);
 
   const toggleDropDown = () => {
     setIsOpen(!isOpen);
@@ -40,6 +40,11 @@ const NavbarLogin = () => {
   };
 
   const handleSearchBar = async () => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_REACT_APP_API_URL}/products/search`,
@@ -47,12 +52,28 @@ const NavbarLogin = () => {
           params: { name: query },
         }
       );
-      setSearchResults(response.data.results);
-      console.log(response.data.results);
+      const results = response.data.results;
+      setSearchResults(results);
+      setNotFound(results.length === 0);
     } catch (error) {
       console.error("Error fetching search items:", error);
+      setNotFound(true);
     }
   };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchBarRef.current && !searchBarRef.current.contains(e.target)) {
+        setSearchResults([]);
+        setNotFound(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <header>
@@ -66,23 +87,44 @@ const NavbarLogin = () => {
             </Link>
           </div>
           <div className="flex items-center space-x-4 xl:mr-12 lg:-mr-48 md:mr-14">
-            <div className="flex relative space-x-2">
-            <div className="flex flex-col mt-1">
-                <input
-                  type="text"
-                  className="pl-5 pr-3 py-1.5 bg-neutral-100 rounded-full text-xs font-normal text-black placeholder-opacity-50 w-96"
-                  placeholder="What are you looking for?"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearchBar()}
-                />
-                <div>
-                  {searchResults.map((item, index) => (
-                    <div key={index} className="p-2 border-b border-gray-200 absolute">
+          <div className="flex relative space-x-2" ref={searchBarRef}>
+              <input
+                type="text"
+                className="pl-5 pr-3 py-1.5 bg-neutral-100 rounded-full text-sm font-normal text-black placeholder-opacity-50 w-96"
+                placeholder="What are you looking for?"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearchBar()}
+              />
+              <div className="absolute top-10 left-0 bg-white shadow-2xl rounded-lg w-full z-10">
+                {searchResults.slice(0, 5).map((item, index) => (
+                  <div
+                    key={index}
+                    className="p-2 border-b border-gray-200 text-sm text-left"
+                  >
+                    <Link
+                      to={`/products/details/${item._id}`}
+                      className="block hover:bg-gray-100 px-4 py-2"
+                    >
                       {item.name}
-                    </div>
-                  ))}
-                </div>
+                    </Link>
+                  </div>
+                ))}
+                {notFound && (
+                  <div className="p-2 text-sm text-gray-500 absolute bg-white shadow-2xl mt-2 w-full">
+                    Not Found
+                  </div>
+                )}
+                {searchResults.length > 0 && (
+                  <div className="p-2 text-center">
+                    <Link
+                      to="/search-results"
+                      className="text-blue-500 hover:underline"
+                    >
+                      See more
+                    </Link>
+                  </div>
+                )}
               </div>
               <Button
                 color="light"
@@ -98,9 +140,7 @@ const NavbarLogin = () => {
                 className="w-10 h-10 rounded-full flex items-center justify-center"
                 href="/cart"
               >
-                <IoCartOutline className="w-5 h-5" 
-                
-                />
+                <IoCartOutline className="w-5 h-5" />
               </Button>
               <Dropdown
                 dismissOnClick={false}
