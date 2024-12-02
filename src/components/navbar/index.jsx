@@ -91,7 +91,7 @@ const NavbarComponent = () => {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearchBar()}
               />
-              <div className="absolute top-10 left-0 bg-white shadow-2xl rounded-lg w-full z-10">
+              <div className="absolute top-10 left-0 bg-white shadow-2xl rounded-lg w-full z-10 dark:text-black">
                 {searchResults.slice(0, 5).map((item, index) => (
                   <div
                     key={index}

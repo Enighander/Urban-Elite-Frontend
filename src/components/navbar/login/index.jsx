@@ -79,14 +79,14 @@ const NavbarLogin = () => {
     <header>
       <Navbar className="w-full p-5 bg-white shadow">
         <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center xl:ml-16 lg:-ml-34">
+          <div className="flex items-center">
             <Link to="/home">
-              <h1 className="text-black text-2xl font-bold tracking-wide dark:text-white">
+              <h1 className="text-black text-2xl font-bold tracking-wide dark:text-white lg:ml-16 2xl:-ml-20">
                 Urban Elite
               </h1>
             </Link>
           </div>
-          <div className="flex items-center space-x-4 xl:mr-12 lg:-mr-48 md:mr-14">
+          <div className="flex items-center space-x-4 ">
           <div className="flex relative space-x-2" ref={searchBarRef}>
               <input
                 type="text"
@@ -96,7 +96,7 @@ const NavbarLogin = () => {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearchBar()}
               />
-              <div className="absolute top-10 left-0 bg-white shadow-2xl rounded-lg w-full z-10">
+              <div className="absolute top-10 left-0 bg-white shadow-2xl rounded-lg w-full z-10 dark:text-black">
                 {searchResults.slice(0, 5).map((item, index) => (
                   <div
                     key={index}

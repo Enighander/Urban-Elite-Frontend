@@ -4,7 +4,7 @@ import Navbar from "../../../components/navbar";
 import FooterComponent from "../../../components/footer/footer";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Card, Spinner, Breadcrumb } from "flowbite-react";
+import { Card, Spinner, Breadcrumb, Button } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import Error404 from "../../../components/error/404";
 import { ToastContainer, toast } from "react-toastify";
@@ -121,16 +121,20 @@ const CategoryProduct = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
               {products.map((product) => (
                 <Card
-                  className="max-w-xs max-h-full"
+                  className="lg:max-w-64 max-h-full"
                   imgAlt={`Product ${product.name}`}
                   imgSrc={product.image}
                   key={product.id}
                 >
                   <Link to={`/products/name/${product.name}`}>
-                    <h5 className="text-sm font-semibold tracking-tight text-gray-900 dark:text-white">
+                    <h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
                       {product.name}
                     </h5>
                   </Link>
+                  <div className="border border-solid border-slate-600" />
+                  <div>
+                    <p className="text-left">{product.description}</p>
+                  </div>
                   <div className="mb-5 mt-2.5 flex items-center">
                     {[...Array(5)].map((_, index) => (
                       <svg
@@ -149,12 +153,12 @@ const CategoryProduct = () => {
                   </div>
                   <div className="flex flex-col justify-between space-y-5">
                     {product.discountPrice ? (
-                      <div className="flex flex-col">
-                        <span className="text-xl text-left font-bold text-gray-500 dark:text-gray-400 line-through">
-                          {formatPrice(product.price)}
-                        </span>
-                        <span className="text-xl text-left font-bold text-gray-900 dark:text-white">
+                      <div className="flex text-left space-x-3">
+                        <span className="2xl:text-xl lg:text-md font-bold text-gray-900 dark:text-white">
                           {formatPrice(product.discountPrice)}
+                        </span>
+                        <span className="2xl:text-md lg:text-sm font-bold text-gray-500 dark:text-gray-400 line-through">
+                          {formatPrice(product.price)}
                         </span>
                       </div>
                     ) : (
@@ -162,16 +166,19 @@ const CategoryProduct = () => {
                         {formatPrice(product.price)}
                       </span>
                     )}
-                    <div className=" flex justify-between">
-                      <a
+                    <div className="flex  justify-center space-x-2">
+                      <Button
                         onClick={() => handleAddToCart(product)}
-                        className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                        className="rounded-lg whitespace-nowrap bg-cyan-700 2xl:w-36 lg:w-24 lg:h-10 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
                       >
-                        Add to cart
-                      </a>
-                      <a className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
+                        Add to carts
+                      </Button>
+                      <Button
+                        onClick=""
+                        className="rounded-lg whitespace-nowrap bg-cyan-700 2xl:w-36 lg:w-24 lg:h-10 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                      >
                         Buy Now
-                      </a>
+                      </Button>
                     </div>
                   </div>
                 </Card>

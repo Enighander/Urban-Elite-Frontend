@@ -13,7 +13,7 @@ const BestSeller = () => {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -105,16 +105,22 @@ const BestSeller = () => {
           ) : products.length > 0 ? (
             products.map((product) => (
               <Card
-                className="md:max-w-64 max-h-full"
+                className="lg:max-w-56 2xl:max-w-72 max-h-full"
                 imgAlt={`Product ${product.name}`}
                 imgSrc={product.image}
                 key={product._id}
               >
-                 <Link to={`/products/details/${product._id}`}>
+                <Link to={`/products/details/${product._id}`}>
                   <h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
                     {product.name}
                   </h5>
                 </Link>
+                <div className="border border-solid border-slate-600" />
+                <div>
+                  <p className="text-left">
+                    {product.description}
+                  </p>
+                </div>
                 <div className="mb-5 mt-2.5 flex items-center">
                   {[...Array(5)].map((_, index) => (
                     <svg
@@ -130,15 +136,16 @@ const BestSeller = () => {
                   <span className="ml-3 mr-2 rounded bg-cyan-100 px-2.5 py-0.5 text-xs font-semibold text-cyan-800 dark:bg-cyan-200 dark:text-cyan-800">
                     5.0
                   </span>
+
                 </div>
                 <div className="flex flex-col justify-between space-y-5">
                   {product.discountPrice ? (
-                    <div className="flex flex-col">
-                      <span className="text-xl text-left font-bold text-gray-500 dark:text-gray-400 line-through">
-                        {formatPrice(product.price)}
-                      </span>
-                      <span className="text-xl text-left font-bold text-gray-900 dark:text-white">
+                    <div className="flex text-left space-x-3">
+                      <span className="2xl:text-xl lg:text-md font-bold text-gray-900 dark:text-white">
                         {formatPrice(product.discountPrice)}
+                      </span>
+                      <span className="2xl:text-md lg:text-sm font-bold text-gray-500 dark:text-gray-400 line-through">
+                        {formatPrice(product.price)}
                       </span>
                     </div>
                   ) : (
@@ -146,16 +153,19 @@ const BestSeller = () => {
                       {formatPrice(product.price)}
                     </span>
                   )}
-                  <div className="flex justify-between">
-                    <a
+                  <div className="flex  justify-center space-x-2">
+                    <Button
                       onClick={() => handleAddToCart(product)}
-                      className="rounded-lg whitespace-nowrap bg-cyan-700 md:w-24 md:h-auto py-2.5 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                      className="rounded-lg whitespace-nowrap bg-cyan-700 2xl:w-36 lg:w-24 lg:h-10 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
                     >
-                      Add to cart
-                    </a>
-                    <a className="rounded-lg whitespace-nowrap bg-cyan-700 md:w-24 md:h-auto  py-2.5 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800">
+                      Add to carts
+                    </Button>
+                    <Button
+                      onClick=""
+                      className="rounded-lg whitespace-nowrap bg-cyan-700 2xl:w-36 lg:w-24 lg:h-10 text-center text-sm font-sm text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+                    >
                       Buy Now
-                    </a>
+                    </Button>
                   </div>
                 </div>
               </Card>
