@@ -10,41 +10,51 @@ import Swal from "sweetalert2";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const handlerUserLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      const endpoints = [
         `${import.meta.env.VITE_REACT_APP_API_URL}/users/login`,
-        {
-          email,
-          password,
-        }
-      );
+        `${import.meta.env.VITE_REACT_APP_API_URL}/admin/login`,
+      ];
 
-      if (response.data && response.data.user) {
-        const { token, username, role, _id: id } = response.data.user;
+      let response;
+      let userData;
 
-        localStorage.setItem("token", token);
-        localStorage.setItem("username", username);
-        localStorage.setItem("role", role);
-        localStorage.setItem("userId", id);
+      for (const endpoint of endpoints) {
+        try {
+          response = await axios.post(endpoint, {
+            identifier,
+            password,
+          });
 
-        Swal.fire({
-          icon: "success",
-          title: "Login Successful",
-        });
-        navigate("/home");
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Login Error",
-          text: "Invalid response from server.",
-        });
+          if (response?.data?.user) {
+            userData = response.data.user;
+            break;
+          } else if (response?.data?.admin) {
+            userData = response.data.admin;
+            break;
+          }
+        } catch (err) {}
       }
+      if (!userData) {
+        throw new Error("Invalid credentials");
+      }
+      const { token, username, role, _id: id } = userData;
+      localStorage.setItem("token", token);
+      localStorage.setItem("username", username);
+      localStorage.setItem("role", role);
+      localStorage.setItem("userId", id);
+
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+      });
+      navigate(role === "admin" ? "/admin-dashboard" : "/home");
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
@@ -86,13 +96,12 @@ const Login = () => {
             <form className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
                 <label className=" text-black text-base font-normal leading-normal dark:text-white">
-                  Email
+                  Email/Username
                 </label>
                 <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   className="w-auto h-10 border-b border-black opacity-70 px-2 text-black"
                   placeholder="Enter your email"
                 />

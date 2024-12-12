@@ -154,7 +154,7 @@ const NavbarLogin = () => {
                 )}
               >
                 {userRoleVariable === "admin" ? (
-                  <Dropdown.Item href={`/profile/admin/${adminId}`}>
+                  <Dropdown.Item href={`/profile/admin/${userId}`}>
                     Profile
                   </Dropdown.Item>
                 ) : (

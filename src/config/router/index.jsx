@@ -16,6 +16,8 @@ import PaymentOption from "../../pages/profile/user/payment-option/index.jsx";
 import Cart from "../../pages/cart/index.jsx";
 import Order from "../../pages/order/index.jsx";
 import OrderHistory from "../../pages/profile/user/order-history/index.jsx"
+import AdminProfile from "../../pages/profile/admin/index.jsx";
+import ProductManagement from "../../pages/profile/admin/products-management/index.jsx";
 
 const Router = () => {
   return (
@@ -43,7 +45,8 @@ const Router = () => {
             <Route path="/profile/user/:id/order-history" element={<OrderHistory/>} />
             {/* User End */}
             {/* Admin */}
-            
+            <Route path="/profile/admin/:id" element={<AdminProfile/>}/>
+            <Route path="/profile/admin/:id/product-management" element={<ProductManagement/>}/>
             {/* Admin End */}
           </Route>
         </Routes>
